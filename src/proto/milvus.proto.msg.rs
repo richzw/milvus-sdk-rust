@@ -33,6 +33,8 @@ pub struct InsertRequest {
     pub num_rows: u64,
     #[prost(enumeration = "InsertDataVersion", tag = "15")]
     pub version: i32,
+    #[prost(string, optional, tag = "16")]
+    pub namespace: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -76,6 +78,8 @@ pub struct MsgPosition {
     pub msg_group: ::prost::alloc::string::String,
     #[prost(uint64, tag = "4")]
     pub timestamp: u64,
+    #[prost(enumeration = "super::common::WalName", tag = "5")]
+    pub wal_name: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -93,9 +97,11 @@ pub struct CreateCollectionRequest {
     pub db_id: i64,
     #[prost(int64, tag = "6")]
     pub collection_id: i64,
-    /// deprecated
+    #[deprecated]
     #[prost(int64, tag = "7")]
     pub partition_id: i64,
+    /// legacy representation, will be set if collection_schema is not set.
+    #[deprecated]
     #[prost(bytes = "vec", tag = "8")]
     pub schema: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, repeated, tag = "9")]
@@ -104,6 +110,10 @@ pub struct CreateCollectionRequest {
     pub physical_channel_names: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     #[prost(int64, repeated, tag = "11")]
     pub partition_i_ds: ::prost::alloc::vec::Vec<i64>,
+    #[prost(string, repeated, tag = "12")]
+    pub partition_names: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "13")]
+    pub collection_schema: ::core::option::Option<super::schema::CollectionSchema>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -210,8 +220,10 @@ pub struct ImportMsg {
     #[prost(int64, repeated, tag = "5")]
     pub partition_i_ds: ::prost::alloc::vec::Vec<i64>,
     #[prost(map = "string, string", tag = "6")]
-    pub options:
-        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    pub options: ::std::collections::HashMap<
+        ::prost::alloc::string::String,
+        ::prost::alloc::string::String,
+    >,
     #[prost(message, repeated, tag = "7")]
     pub files: ::prost::alloc::vec::Vec<ImportFile>,
     #[prost(message, optional, tag = "8")]
